@@ -1,0 +1,1 @@
+Apply [.agents/skills/sync-agents/SKILL.md](../skills/sync-agents/SKILL.md): run `powershell -File scripts/sync-agents.ps1` (Windows) or `./scripts/sync-agents.sh` (macOS/Linux) from repo root to mirror `.agents/` into `.cursor/`, `.claude/`, and `.github/`.

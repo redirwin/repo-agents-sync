@@ -1,0 +1,1 @@
+Apply [.agents/skills/hello-world/SKILL.md](../skills/hello-world/SKILL.md): run the hello-world demo and respond with the single confirmation line from the skill's Steps section, substituting the tool you are running in (cursor, claude, or copilot).
