@@ -9,7 +9,7 @@ description: >-
 
 # Hello world
 
-A tiny demo skill that ships with agents-sync-kit so you can confirm each agent (Cursor, Claude Code, and GitHub Copilot) picks up the synced `.agents/` tree.
+A tiny demo skill that ships with repo-agents-sync so you can confirm each agent (Cursor, Claude Code, and GitHub Copilot) picks up the synced `.agents/` tree.
 
 ## Steps
 
