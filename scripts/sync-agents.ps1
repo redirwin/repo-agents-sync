@@ -14,6 +14,20 @@ if (-not (Test-Path $source)) {
     exit 1
 }
 
+# Enforce: every file in .agents/commands/ (other than README.md) must start with "repo-".
+# Rationale documented in README.md ("Naming conventions").
+$commandsDir = Join-Path $source 'commands'
+if (Test-Path $commandsDir) {
+    $bad = Get-ChildItem -Path $commandsDir -Filter '*.md' -File |
+           Where-Object { $_.Name -ne 'README.md' -and $_.Name -notlike 'repo-*' }
+    if ($bad) {
+        Write-Host "Command files must be named repo-<name>.md. Offending file(s):" -ForegroundColor Red
+        foreach ($f in $bad) { Write-Host "  $($f.FullName)" -ForegroundColor Red }
+        Write-Host "Rename each to repo-<name>.md and re-run. See README.md -> Naming conventions." -ForegroundColor Red
+        exit 1
+    }
+}
+
 $targets = @(
     @{ Tool = 'cursor'; Base = '.cursor';  Skills = 'skills'; Commands = 'commands';           Rules = 'rules' }
     @{ Tool = 'claude'; Base = '.claude';  Skills = 'skills'; Commands = 'commands';           Rules = 'rules' }

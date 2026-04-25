@@ -5,6 +5,26 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ROOT/.agents"
 [ -d "$SRC" ] || { echo ".agents/ not found"; exit 1; }
 
+# Enforce: every file in .agents/commands/ (other than README.md) must start with "repo-".
+# Rationale documented in README.md ("Naming conventions").
+if [ -d "$SRC/commands" ]; then
+    bad=()
+    while IFS= read -r -d '' f; do
+        name="$(basename "$f")"
+        case "$name" in
+            README.md) continue ;;
+            repo-*) continue ;;
+            *) bad+=("$f") ;;
+        esac
+    done < <(find "$SRC/commands" -maxdepth 1 -type f -name '*.md' -print0)
+    if [ "${#bad[@]}" -gt 0 ]; then
+        echo "Command files must be named repo-<name>.md. Offending file(s):" >&2
+        for f in "${bad[@]}"; do echo "  $f" >&2; done
+        echo "Rename each to repo-<name>.md and re-run. See README.md -> Naming conventions." >&2
+        exit 1
+    fi
+fi
+
 sync_pair() {
     local src_sub="$1" dst_sub="$2" base="$3" suffix="${4-}"
     local src="$SRC/$src_sub"

@@ -5,7 +5,7 @@ description: >-
   tool-specific folders `.cursor/`, `.claude/`, and `.github/` by running
   `scripts/sync-agents.ps1` (Windows) or `scripts/sync-agents.sh` (macOS or
   Linux). Use after editing anything under `.agents/`, on fresh clones when
-  the mirrors are gitignored, or when the user runs /sync-agents.
+  the mirrors are gitignored, or when the user runs /repo-sync-agents.
 ---
 
 # Sync agents
