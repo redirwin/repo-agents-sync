@@ -1,4 +1,4 @@
-# repo-agents-sync
+# Repo Agents Sync
 
 One canonical folder for AI agent skills, commands, and rules. A small script mirrors it into the paths Cursor, Claude Code, and GitHub Copilot expect. Edit once, every supported agent picks it up.
 
