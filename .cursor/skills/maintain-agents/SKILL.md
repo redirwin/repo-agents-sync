@@ -1,5 +1,5 @@
 ---
-name: agents-maintain
+name: maintain-agents
 description: >-
   Audits and updates the README index files inside `.agents/skills/`,
   `.agents/commands/`, and `.agents/rules/` so they accurately reflect the
@@ -9,7 +9,7 @@ description: >-
   "update agent readmes", "refresh agents", or "maintain agents".
 ---
 
-# Agents maintain
+# Maintain agents
 
 Keeps the three `.agents/` README index files in sync with what is actually on disk, then re-mirrors everything with `sync-agents`.
 

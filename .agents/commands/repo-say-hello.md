@@ -1,0 +1,1 @@
+Apply [.agents/skills/say-hello/SKILL.md](../skills/say-hello/SKILL.md): run the say-hello demo and respond with the single confirmation line from the skill's Steps section, substituting the tool you are running in (cursor, claude, or copilot).

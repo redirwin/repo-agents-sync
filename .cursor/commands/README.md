@@ -20,6 +20,6 @@ The prefix:
 | Command | Purpose |
 |---|---|
 | [/repo-sync-agents](repo-sync-agents.md) | Run the sync script to mirror `.agents/` into each tool's folder. |
-| [/repo-hello-world](repo-hello-world.md) | Demo command for verifying the sync works across all three agents. Delete once verified. |
+| [/repo-say-hello](repo-say-hello.md) | Demo command for verifying the sync works across all three agents. Delete once verified. |
 
 <!-- Add new commands here with a one-line purpose. The repo- prefix is required; the sync script will refuse otherwise. -->

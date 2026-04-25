@@ -14,8 +14,8 @@ One canonical folder for AI agent skills, commands, and rules. A small script mi
 - `.agents/` as the single source of truth for skills, commands, and rules.
 - `scripts/sync-agents.ps1` (Windows PowerShell 5.1+ or PowerShell 7) and `scripts/sync-agents.sh` (bash + rsync) to regenerate the tool-specific mirrors.
 - Pointer files (`CLAUDE.md` and `.github/copilot-instructions.md`) so Claude Code and Copilot read the same `AGENTS.md` as Cursor and any other `agents.md`-aware tool.
-- A demo `hello-world` skill and `/repo-hello-world` slash command you can use to verify the sync works in each agent, then delete.
-- A starter `agents-maintain` skill that audits the `.agents/*/README.md` index files against what is actually on disk and re-runs the sync.
+- A demo `say-hello` skill and `/repo-say-hello` slash command you can use to verify the sync works in each agent, then delete.
+- A starter `maintain-agents` skill that audits the `.agents/*/README.md` index files against what is actually on disk and re-runs the sync.
 - A required `repo-` prefix on all command files (enforced by the sync script) so kit commands cannot collide with built-in or user-scoped commands. See [Naming conventions](#naming-conventions).
 
 ## Install
@@ -45,21 +45,21 @@ After the first sync you should have `.cursor/`, `.claude/`, and `.github/{skill
 
 ### Verifying the setup with the demo skill
 
-The demo `hello-world` skill ships with the kit so you can confirm each agent reads its synced copy:
+The demo `say-hello` skill ships with the kit so you can confirm each agent reads its synced copy:
 
-- In Cursor or Claude Code, type `/repo-hello-world`.
-- In Copilot (VS Code agent mode), invoke the `repo-hello-world` prompt.
+- In Cursor or Claude Code, type `/repo-say-hello`.
+- In Copilot (VS Code agent mode), invoke the `repo-say-hello` prompt.
 
-Each should respond with the confirmation line from `.agents/skills/hello-world/SKILL.md`. When you are satisfied, delete the demo:
+Each should respond with the confirmation line from `.agents/skills/say-hello/SKILL.md`. When you are satisfied, delete the demo:
 
 ```powershell
-Remove-Item -Recurse -Force .agents/skills/hello-world
-Remove-Item -Force .agents/commands/repo-hello-world.md
+Remove-Item -Recurse -Force .agents/skills/say-hello
+Remove-Item -Force .agents/commands/repo-say-hello.md
 powershell -File scripts/sync-agents.ps1 -Clean
 ```
 
 ```bash
-rm -rf .agents/skills/hello-world .agents/commands/repo-hello-world.md
+rm -rf .agents/skills/say-hello .agents/commands/repo-say-hello.md
 ./scripts/sync-agents.sh
 ```
 
@@ -127,14 +127,14 @@ Rules are also unprefixed, for the same reason: they apply implicitly when the a
 
 This kit is designed for **repo-scoped** agent config: skills, commands, and rules that ship with the repository and operate on its scaffolding. It does not address the parallel **user-scoped** layer that all the supported agents also recognize.
 
-| Scope | What it is | Where it lives | Who manages it |
-|---|---|---|---|
-| Repo-scoped | Skills/commands/rules tied to this codebase | `.agents/` and the generated mirrors | Committed to the repo |
-| User-scoped | Generic personal preferences and shortcuts | `~/.claude/`, `~/.codex/`, VS Code user folder | A personal dotfiles repo (recommended) |
+| Scope       | What it is                                  | Where it lives                                 | Who manages it                         |
+| ----------- | ------------------------------------------- | ---------------------------------------------- | -------------------------------------- |
+| Repo-scoped | Skills/commands/rules tied to this codebase | `.agents/` and the generated mirrors           | Committed to the repo                  |
+| User-scoped | Generic personal preferences and shortcuts  | `~/.claude/`, `~/.codex/`, VS Code user folder | A personal dotfiles repo (recommended) |
 
 Both layers can coexist. A developer using this kit might still have `/my-onboard`, `/my-nccp`, etc. installed in their user-scoped folders, available in every repo they work in. The `repo-` prefix on this kit's commands keeps the two layers from colliding.
 
-For Cursor specifically: it does not currently support a user-scoped commands or skills folder. User-scoped behavior in Cursor is limited to **User Rules** (configured in **Settings -> Rules**, stored in Cursor's settings DB, not as discoverable files). When a developer needs a user-scoped shortcut to work in Cursor for a particular repo, the practical workaround is to copy the relevant file or skill into that repo's `.agents/` and run the sync.
+For Cursor specifically: it does not currently support a user-scoped commands or skills folder. User-scoped behavior in Cursor is limited to **User Rules** (configured in **Settings -> Rules**, stored in Cursor's settings DB, not as discoverable files). When a developer needs a user-scoped shortcut to work in Cursor for a particular repo, the practical workaround is to copy (or create) the relevant file or skill into that repo's `.agents/` and run the sync.
 
 ## Layout
 
