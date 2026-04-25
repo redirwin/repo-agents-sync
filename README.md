@@ -181,7 +181,7 @@ Pick one. Never do both.
 
 ### Option A (recommended for most repos): commit the mirrors
 
-A fresh clone works with any supported agent with zero setup. Cost: you must run the sync before committing any change to `.agents/`. Add a short note to your own `README.md`:
+A fresh clone works with any supported agent with zero setup. Cost: you must run the sync before committing any change to `.agents/`. Add a short note to your own `README.md` and/or `AGENTS.md`:
 
 ```markdown
 ## Local setup
