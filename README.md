@@ -1,4 +1,4 @@
-# Repo Agents Sync
+# Repo Agents Sync (repo-agents-sync)
 
 One canonical folder for AI agent skills, commands, and rules. A small script mirrors it into the paths Cursor, Claude Code, and GitHub Copilot expect. Edit once, every supported agent picks it up.
 
@@ -20,6 +20,19 @@ One canonical folder for AI agent skills, commands, and rules. A small script mi
 
 ## Install
 
+Two install paths, depending on whether you're starting a new repo or retrofitting an existing one.
+
+### Option 1 - Use as a GitHub template (new repos)
+
+This repo is configured as a GitHub **template repository**. To bootstrap a new repo seeded with the kit:
+
+- **Web UI:** click the green **"Use this template"** button on the [repo page](https://github.com/redirwin/repo-agents-sync), then **"Create a new repository"**.
+- **CLI:** `gh repo create my-new-repo --template redirwin/repo-agents-sync --public` (or `--private`).
+
+The new repo lands with all kit files in place. Skip to "First sync" below.
+
+### Option 2 - Manual copy (existing repos)
+
 Copy these files and folders from this kit into your own repo root:
 
 - `AGENTS.md` - customize the placeholders for your project
@@ -27,6 +40,8 @@ Copy these files and folders from this kit into your own repo root:
 - `.github/copilot-instructions.md` - leave as-is
 - `.agents/` - the canonical tree (keep, edit, or clear contents to taste)
 - `scripts/sync-agents.ps1` and `scripts/sync-agents.sh`
+
+### First sync
 
 Then run the sync script once from the repo root to generate the mirrors:
 
