@@ -10,7 +10,6 @@ Each skill lives in its own folder with a `SKILL.md` (YAML frontmatter + body) a
 |---|---|
 | [agents-maintain](agents-maintain/SKILL.md) | Audit and update `.agents/` README indexes, then run sync-agents. |
 | [hello-world](hello-world/SKILL.md) | Demo skill to verify each agent picks up the synced tree. Delete once verified. |
-| [skill-authoring](skill-authoring/SKILL.md) | Standards and steps for creating or editing skills in this repo. |
 | [sync-agents](sync-agents/SKILL.md) | Regenerate the tool-specific mirrors from `.agents/`. |
 
 <!-- Add new skills here with a one-line purpose. Keep canonical content under .agents/skills/<name>/SKILL.md and re-run sync-agents after edits. -->

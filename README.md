@@ -15,9 +15,7 @@ One canonical folder for AI agent skills, commands, and rules. A small script mi
 - `scripts/sync-agents.ps1` (Windows PowerShell 5.1+ or PowerShell 7) and `scripts/sync-agents.sh` (bash + rsync) to regenerate the tool-specific mirrors.
 - Pointer files (`CLAUDE.md` and `.github/copilot-instructions.md`) so Claude Code and Copilot read the same `AGENTS.md` as Cursor and any other `agents.md`-aware tool.
 - A demo `hello-world` skill and `/repo-hello-world` slash command you can use to verify the sync works in each agent, then delete.
-- Two starter skills that ship enabled and are useful in any repo using this kit:
-  - `agents-maintain` - audits the `.agents/*/README.md` index files against what is actually on disk and re-runs the sync.
-  - `skill-authoring` - documents the conventions for adding or editing skills in this repo.
+- A starter `agents-maintain` skill that audits the `.agents/*/README.md` index files against what is actually on disk and re-runs the sync.
 - A required `repo-` prefix on all command files (enforced by the sync script) so kit commands cannot collide with built-in or user-scoped commands. See [Naming conventions](#naming-conventions).
 
 ## Install
