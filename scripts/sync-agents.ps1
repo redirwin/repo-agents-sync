@@ -75,4 +75,32 @@ foreach ($t in $targets) {
     }
 }
 
+# --- MCP config sync ---
+# Canonical: .agents/mcp.json (uses `mcpServers` top-level key).
+# Emits:
+#   .mcp.json          (Claude Code, project-scoped)        — `mcpServers`
+#   .cursor/mcp.json   (Cursor)                             — `mcpServers`
+#   .vscode/mcp.json   (VS Code Copilot Chat)               — `servers` (key renamed)
+# See .agents/MCP-README.md for the convention. Block is a no-op when
+# .agents/mcp.json is absent, so repos that don't use MCPs need no change.
+$mcpSrc = Join-Path $source 'mcp.json'
+if (Test-Path $mcpSrc) {
+    $mcpText = [System.IO.File]::ReadAllText($mcpSrc)
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+    if (-not (Test-Path (Join-Path $root '.cursor'))) { New-Item -ItemType Directory -Path (Join-Path $root '.cursor') | Out-Null }
+    if (-not (Test-Path (Join-Path $root '.vscode'))) { New-Item -ItemType Directory -Path (Join-Path $root '.vscode') | Out-Null }
+
+    # Claude Code + Cursor: identical to canonical (mcpServers)
+    [System.IO.File]::WriteAllText((Join-Path $root '.mcp.json'),         $mcpText, $utf8NoBom)
+    [System.IO.File]::WriteAllText((Join-Path $root '.cursor/mcp.json'),  $mcpText, $utf8NoBom)
+
+    # VS Code: rename top-level `mcpServers` -> `servers`. Regex assumes the key
+    # name is not also used as a server name; safe for a normal MCP config.
+    $vscodeText = [regex]::Replace($mcpText, '"mcpServers"\s*:', '"servers":')
+    [System.IO.File]::WriteAllText((Join-Path $root '.vscode/mcp.json'), $vscodeText, $utf8NoBom)
+
+    Write-Host "  synced mcp.json -> .mcp.json, .cursor/mcp.json, .vscode/mcp.json"
+}
+
 Write-Host "Agent config sync complete."

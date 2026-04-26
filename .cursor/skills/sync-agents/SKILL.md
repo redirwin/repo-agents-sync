@@ -1,22 +1,24 @@
 ---
 name: sync-agents
 description: >-
-  Mirrors `.agents/skills`, `.agents/commands`, and `.agents/rules` into the
-  tool-specific folders `.cursor/`, `.claude/`, and `.github/` by running
-  `scripts/sync-agents.ps1` (Windows) or `scripts/sync-agents.sh` (macOS or
-  Linux). Use after editing anything under `.agents/`, on fresh clones when
-  the mirrors are gitignored, or when the user runs /repo-sync-agents.
+  Mirrors `.agents/skills`, `.agents/commands`, `.agents/rules`, and
+  (optionally) `.agents/mcp.json` into the tool-specific folders `.cursor/`,
+  `.claude/`, `.github/`, `.vscode/`, and the project-root `.mcp.json` by
+  running `scripts/sync-agents.ps1` (Windows) or `scripts/sync-agents.sh`
+  (macOS or Linux). Use after editing anything under `.agents/`, on fresh
+  clones when the mirrors are gitignored, or when the user runs
+  /repo-sync-agents.
 ---
 
 # Sync agents
 
-Regenerates the tool-specific mirrors from the canonical `.agents/` tree so Cursor, Claude Code, and GitHub Copilot all pick up current skills, commands, and rules.
+Regenerates the tool-specific mirrors from the canonical `.agents/` tree so Cursor, Claude Code, GitHub Copilot, and VS Code Copilot Chat all pick up current skills, commands, rules, and (optional) MCP server definitions.
 
 ## Preconditions
 
 - Run from the **repository root** (the folder that contains `.agents/`).
 - Windows: Windows PowerShell 5.1+ (ships with Windows) or PowerShell 7 (`pwsh`).
-- macOS/Linux: `bash` with `rsync` on the PATH.
+- macOS/Linux: `bash` with `rsync` on the PATH. The MCP step also requires `jq`; if `jq` is missing the MCP files are skipped with a warning.
 
 ## Steps
 
@@ -26,13 +28,13 @@ Regenerates the tool-specific mirrors from the canonical `.agents/` tree so Curs
 2. **Run the script** from repo root:
    - Windows: `powershell -File scripts/sync-agents.ps1` (or `pwsh scripts/sync-agents.ps1` if PowerShell 7 is installed)
    - macOS/Linux: `./scripts/sync-agents.sh`
-3. **Report** which tool folders were written and which source subfolders (`skills`, `commands`, `rules`) were mirrored.
+3. **Report** which tool folders were written and which source subfolders (`skills`, `commands`, `rules`) plus `mcp.json` (if present) were mirrored. The MCP step writes `.mcp.json` (Claude Code), `.cursor/mcp.json` (Cursor), and `.vscode/mcp.json` (VS Code Copilot Chat — top-level key renamed `mcpServers` → `servers`); see [`.agents/MCP-README.md`](../../MCP-README.md) for the convention.
 
 ## When to add `-Clean` / a fresh rebuild
 
 Add `-Clean` (PowerShell) or wipe the target folders manually (bash) when:
 
-- A skill or command was **renamed or deleted** in `.agents/` and a stale file may be lingering in `.cursor/`, `.claude/`, or `.github/`.
+- A skill or command was **renamed or deleted** in `.agents/` and a stale file may be lingering in `.cursor/`, `.claude/`, `.github/`, or `.vscode/`.
 - The user explicitly asks for a clean rebuild.
 
 By default, run without `-Clean` for a fast incremental copy.

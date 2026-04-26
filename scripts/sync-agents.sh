@@ -54,4 +54,26 @@ sync_pair skills   skills       "$ROOT/.github"
 sync_pair commands prompts      "$ROOT/.github" ".prompt.md"
 sync_pair rules    instructions "$ROOT/.github" ".instructions.md"
 
+# --- MCP config sync ---
+# Canonical: .agents/mcp.json (uses `mcpServers` top-level key).
+# Emits:
+#   .mcp.json          (Claude Code, project-scoped)        — `mcpServers`
+#   .cursor/mcp.json   (Cursor)                             — `mcpServers`
+#   .vscode/mcp.json   (VS Code Copilot Chat)               — `servers` (key renamed)
+# See .agents/MCP-README.md for the convention. Block is a no-op when
+# .agents/mcp.json is absent, so repos that don't use MCPs need no change.
+mcp_src="$SRC/mcp.json"
+if [ -f "$mcp_src" ]; then
+    if ! command -v jq >/dev/null 2>&1; then
+        echo "  WARN: jq not found; skipping MCP sync. Install jq to enable." >&2
+    else
+        cp "$mcp_src" "$ROOT/.mcp.json"
+        mkdir -p "$ROOT/.cursor" "$ROOT/.vscode"
+        cp "$mcp_src" "$ROOT/.cursor/mcp.json"
+        # VS Code uses `servers` instead of `mcpServers`
+        jq '{servers: .mcpServers}' "$mcp_src" > "$ROOT/.vscode/mcp.json"
+        echo "  synced mcp.json -> .mcp.json, .cursor/mcp.json, .vscode/mcp.json"
+    fi
+fi
+
 echo "Agent config sync complete."

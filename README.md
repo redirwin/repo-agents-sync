@@ -1,6 +1,6 @@
 # Repo Agents Sync (repo-agents-sync)
 
-One canonical folder for AI agent skills, commands, and rules. A small script mirrors it into the paths Cursor, Claude Code, and GitHub Copilot expect. Edit once, every supported agent picks it up.
+One canonical folder for AI agent skills, commands, rules, and MCP server definitions. A small script mirrors it into the paths Cursor, Claude Code, GitHub Copilot, and VS Code Copilot Chat expect. Edit once, every supported agent picks it up.
 
 ## Why
 
@@ -11,12 +11,13 @@ One canonical folder for AI agent skills, commands, and rules. A small script mi
 
 ## What you get
 
-- `.agents/` as the single source of truth for skills, commands, and rules.
-- `scripts/sync-agents.ps1` (Windows PowerShell 5.1+ or PowerShell 7) and `scripts/sync-agents.sh` (bash + rsync) to regenerate the tool-specific mirrors.
+- `.agents/` as the single source of truth for skills, commands, rules, and (optional) MCP server definitions.
+- `scripts/sync-agents.ps1` (Windows PowerShell 5.1+ or PowerShell 7) and `scripts/sync-agents.sh` (bash + rsync; `jq` for the MCP step) to regenerate the tool-specific mirrors.
 - Pointer files (`CLAUDE.md` and `.github/copilot-instructions.md`) so Claude Code and Copilot read the same `AGENTS.md` as Cursor and any other `agents.md`-aware tool.
 - A demo `say-hello` skill and `/repo-say-hello` slash command you can use to verify the sync works in each agent, then delete.
 - A starter `maintain-agents` skill that audits the `.agents/*/README.md` index files against what is actually on disk and re-runs the sync.
 - A required `repo-` prefix on all command files (enforced by the sync script) so kit commands cannot collide with built-in or user-scoped commands. See [Naming conventions](#naming-conventions).
+- Optional MCP server sync from `.agents/mcp.json` to per-tool config files. See [MCP servers](#mcp-servers).
 
 ## Install
 
@@ -48,7 +49,7 @@ Then run the sync script once from the repo root to generate the mirrors:
 - Windows: `powershell -File scripts/sync-agents.ps1`
 - macOS/Linux: `chmod +x scripts/sync-agents.sh && ./scripts/sync-agents.sh`
 
-After the first sync you should have `.cursor/`, `.claude/`, and `.github/{skills,prompts,instructions}/` populated.
+After the first sync you should have `.cursor/`, `.claude/`, and `.github/{skills,prompts,instructions}/` populated. If you have a `.agents/mcp.json`, you'll also have `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`.
 
 ## Usage
 
@@ -122,6 +123,33 @@ The `repo-` prefix is **required**. The sync script refuses to run if any file i
 
 Include any tool-specific frontmatter inline (for example Copilot's `applyTo:` glob). Agents that do not understand that frontmatter ignore it.
 
+## MCP servers
+
+Project-scoped MCP servers can be defined once in `.agents/mcp.json` and mirrored to each tool's expected config file by the same sync script.
+
+```json
+{
+  "mcpServers": {
+    "example-server": {
+      "type": "http",
+      "url": "https://example.com/mcp"
+    }
+  }
+}
+```
+
+The sync emits:
+
+| Tool | Path | Top-level key |
+|---|---|---|
+| Claude Code | `.mcp.json` (repo root) | `mcpServers` |
+| Cursor | `.cursor/mcp.json` | `mcpServers` |
+| VS Code Copilot Chat | `.vscode/mcp.json` | `servers` (renamed during sync) |
+
+The MCP step is fully optional — repos with no `.agents/mcp.json` skip it silently. The bash sync requires `jq` for the JSON-key transform; without `jq` the MCP step warns and skips.
+
+OpenAI Codex CLI does not honor project-scoped MCP config; it reads `~/.codex/config.toml` only. If you need a project's MCPs available in Codex, manage them user-level (typically from a personal dotfiles repo). See [`.agents/MCP-README.md`](.agents/MCP-README.md) for the full convention, including secrets handling and schema-drift notes.
+
 ## Naming conventions
 
 The kit enforces one naming rule: **all files in `.agents/commands/` (except `README.md`) must be named `repo-<name>.md`**. The sync script refuses to run otherwise, in both PowerShell and bash.
@@ -163,6 +191,7 @@ your-repo/
     skills/<name>/SKILL.md
     commands/<name>.md
     rules/<name>.md
+    mcp.json                          optional MCP server definitions
 
   .cursor/                            generated mirrors
   .claude/
@@ -170,9 +199,13 @@ your-repo/
   .github/prompts/                    commands, renamed to *.prompt.md
   .github/instructions/               rules, renamed to *.instructions.md
 
+  .mcp.json                           generated (Claude Code), if mcp.json present
+  .cursor/mcp.json                    generated (Cursor)
+  .vscode/mcp.json                    generated (VS Code Copilot Chat, key renamed)
+
   scripts/
     sync-agents.ps1                   Windows
-    sync-agents.sh                    macOS/Linux
+    sync-agents.sh                    macOS/Linux (jq required for MCP step)
 ```
 
 ## Commit or gitignore the mirrors
@@ -201,12 +234,15 @@ Keeps the repo small. Cost: every contributor must run the sync after cloning, a
 .cursor/skills/
 .cursor/commands/
 .cursor/rules/
+.cursor/mcp.json
 .claude/skills/
 .claude/commands/
 .claude/rules/
 .github/skills/
 .github/prompts/
 .github/instructions/
+.vscode/mcp.json
+.mcp.json
 ```
 
 Do not gitignore `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, or anything under `.agents/`.
@@ -221,10 +257,6 @@ Do not gitignore `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, or
 
 ## Future extensions
 
-- **MCP server configs.** The same source-of-truth pattern fits MCP definitions: a canonical `.agents/mcp.json` mirrored to `.cursor/mcp.json`, repo-root `.mcp.json` (Claude Code), and `.vscode/mcp.json` (Copilot / VS Code agent mode). Not shipped in v1. If you add it yourself, be aware of three things:
-  - **Secrets.** Never commit raw API keys. Use `${env:FOO}`-style env var references, or keep personal MCPs in your user-level config (`~/.cursor/mcp.json`, `~/.claude.json`, or VS Code user settings) instead of the repo.
-  - **Schema drift.** VS Code supports `inputs` (prompted variables); Cursor and Claude ignore it. Transport types (`stdio`, `sse`, `http`) and env var substitution syntax differ slightly. Stick to the common subset in the canonical file unless you maintain tool-specific overrides.
-  - **Scope.** This kit only handles project-scoped configs. Personal servers belong at the user level.
 - **Subagent and persona syncing.** Add a `.agents/agents/` folder plus a few lines to the script when you start using them.
 
 ## Credits and references
