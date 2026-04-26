@@ -177,7 +177,7 @@ This kit is designed for **repo-scoped** agent config: skills, commands, and rul
 
 Both layers can coexist. A developer using this kit might still have `/my-onboard`, `/my-nccp`, etc. installed in their user-scoped folders, available in every repo they work in. The `repo-` prefix on this kit's commands keeps the two layers from colliding.
 
-For Cursor specifically: it does not currently support a user-scoped commands or skills folder. User-scoped behavior in Cursor is limited to **User Rules** (configured in **Settings -> Rules**, stored in Cursor's settings DB, not as discoverable files). When a developer needs a user-scoped shortcut to work in Cursor for a particular repo, the practical workaround is to copy (or create) the relevant file or skill into that repo's `.agents/` and run the sync.
+For Cursor specifically: it does not currently support a user-scoped commands or skills folder. User-scoped behavior in Cursor is limited to **User Rules** (configured in **Settings -> Rules**, stored in Cursor's settings DB, not as discoverable files) and **MCP servers** (`~/.cursor/mcp.json`, which Cursor merges with any project-scoped `.cursor/mcp.json`). When a developer needs a user-scoped command or skill to work in Cursor for a particular repo, the practical workaround is to copy (or create) the relevant file or skill into that repo's `.agents/` and run the sync.
 
 ## Layout
 
@@ -249,6 +249,7 @@ Do not gitignore `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, or
 
 ## Known limitations
 
+- **Claude Code does not auto-load `.claude/rules/`.** "Rules" is Cursor's term and a Cursor-native feature; Copilot honors the same idea under the name "Custom Instructions" via `.github/instructions/*.instructions.md`. Claude Code has no documented equivalent — it reads `CLAUDE.md`, skills, and commands automatically, but the synced `.claude/rules/*.md` files sit inert unless something references them. To make a rule actually apply in Claude Code, `@`-import it from `CLAUDE.md` (e.g. `@.claude/rules/my-rule.md`). For constraints that must apply uniformly to all three agents, putting them directly in `AGENTS.md` is more reliable than relying on the rules pipeline.
 - **Tool-specific frontmatter is lossy.** Copilot's `applyTo:` glob in `.github/instructions/*.instructions.md` has no equivalent in Cursor or Claude Code. Put the frontmatter in the canonical file; tools that do not understand it will ignore it.
 - **Global Claude Code config lives outside the repo.** Claude Code also reads `~/.claude/` at the user level. Cross-repo preferences belong there, not in `.agents/`.
 - **Cursor slash command naming.** Cursor turns `.cursor/commands/foo.md` into `/foo`. Pick your canonical filename with that mapping in mind.
